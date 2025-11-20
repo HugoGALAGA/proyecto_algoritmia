@@ -2,7 +2,7 @@ import networkx as nx
 
 def grafo_base():
 
-    G = nx.Graph()
+    G = nx.DiGraph()
 
     principal_nodes= range (1,60)
     G.add_nodes_from(principal_nodes)
