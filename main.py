@@ -6,6 +6,8 @@ def grafo_base():
     G = nx.Graph()
 
     principal_nodes= range (1,60)
+    G.add_nodes_from(principal_nodes)
+
 
     #primera fila, la del nodo 1 a la 14 de la 4A calle que es el limite superior
     #va de izquierda a derecha 
