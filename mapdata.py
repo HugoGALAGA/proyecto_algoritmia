@@ -167,8 +167,7 @@ def grafo_base():
     G.add_edge(14, 37, weight=0.2)
     G.add_edge(37, 47, weight=0.06)
     G.add_edge(47, 59, weight=0.135)
-
-    print("Grafo base")
+    
     return G
 
 def agregar_POIs(G):
@@ -265,5 +264,4 @@ def agregar_POIs(G):
     G.add_edge(43, poi_plaza, weight=0.028)
     G.add_edge(poi_plaza, 32, weight=0.027)
 
-    print("POIS para el grafo")
     return G 
