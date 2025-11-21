@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Navigator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <button id="edit-btn" onclick="toggleEditMode()" style="position:fixed; top:10px; right:10px; z-index:1000; opacity:0.5;">Editar</button>
+
+    <div class="layout">
+        <div class="sidebar">
+            <h2 class="neon-title">CONTROL DE RUTA</h2>
+            
+            <div class="control-group">
+                <label>MODO</label>
+                <select id="modo" onchange="toggleIntermedio()">
+                    <option value="simple">Directo</option>
+                    <option value="parada">Con Parada (C)</option>
+                    <option value="obstaculo">Evitar Lugar (C)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>ORIGEN (A)</label>
+                <select id="origen"></select>
+            </div>
+
+            <div class="control-group" id="group-intermedio" style="display:none;">
+                <label id="label-intermedio">PUNTO C</label>
+                <select id="intermedio"></select>
+            </div>
+
+            <div class="control-group">
+                <label>DESTINO (B)</label>
+                <select id="destino"></select>
+            </div>
+
+            <div class="control-group checkboxes">
+                <label><input type="checkbox" id="trafico-pesado"> Tráfico Pesado</label>
+                <label><input type="checkbox" id="trafico-ligero"> Tráfico Ligero</label>
+            </div>
+
+            <button onclick="calcularRuta()">CALCULAR</button>
+
+            <div id="status">Esperando...</div>
+        </div>
+
+        <div class="map-container">
+            <div id="map-grid"></div>
+        </div>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>
