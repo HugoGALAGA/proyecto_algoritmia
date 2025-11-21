@@ -3,71 +3,280 @@ import networkx as nx
 
 app = Flask(__name__)
 
-# DATOS (Nombre se usa internamente para el grafo, pero el usuario verá números)
 LUGARES = {
-    1:  {"nombre": "Centro Técnico",      "conn": [(1, 0.02), (15, 0.05)]},
-    2:  {"nombre": "Colegio Anglo",       "conn": [(27, 0.08), (28, 0.11)]},
-    3:  {"nombre": "CONACMI",             "conn": [(3, 0.035), (17, 0.035)]},
-    4:  {"nombre": "PNC",                 "conn": [(30, 0.02), (18, 0.08)]},
-    5:  {"nombre": "Parque J. Batres",    "conn": [(3, 0.09), (4, 0.02)]},
-    6:  {"nombre": "La Torre",            "conn": [(20, 0.1), (19, 0.02)]},
-    7:  {"nombre": "PATSY",               "conn": [(20, 0.02), (6, 0.06)]},
-    8:  {"nombre": "Palacio Nacional",    "conn": [(22, 0.05), (21, 0.05)]},
-    9:  {"nombre": "Plaza Constitución",  "conn": [(54, 0.13), (22, 0.16)]},
-    10: {"nombre": "Pizza Hut",           "conn": [(54, 0.11), (22, 0.18)]},
-    11: {"nombre": "Almacén el Cisne",    "conn": [(25, 0.05), (24, 0.1)]},
-    12: {"nombre": "Mercado Central",     "conn": [(44, 0.028), (33, 0.027)]},
-    13: {"nombre": "Sist. Penitenciario", "conn": [(35, 0.04), (36, 0.04)]},
-    14: {"nombre": "Hotel",               "conn": [(13, 0.05), (14, 0.13)]},
-    15: {"nombre": "Parque Colón",        "conn": [(47, 0.085), (46, 0.085)]},
-    16: {"nombre": "Santuario Guadalupe", "conn": [(40, 0.7), (39, 0.7)]},
-    17: {"nombre": "G&T",                 "conn": [(42, 0.075), (41, 0.075)]}
+    1: "Centro técnico Guatemalteco",
+    2: "Colegio Anglo Guatemalteco",
+    3: "CONACMI",
+    4: "PNC",
+    5: "Parque José Batres Montufar",
+    6: "Supermercado La Torre",
+    7: "PATSY",
+    8: "Palacio Nacional de la Cultura",
+    9: "Plaza de la constitucion",
+    10: "Pizza Hut",
+    11: "Almacén el Cisne",
+    12: "Mercado Central",
+    13: "Direccion General del Sistema Peninteciario",
+    14: "Hotel",
+    15: "Parque Colón",
+    16: "Santuario de Guadalupe",
+    17: "G&T"
 }
 
-def construir_grafo():
+def grafo_base():
     G = nx.DiGraph()
+    principal_nodes= range (1,60)
+    G.add_nodes_from(principal_nodes)
+
+    G.add_edge(1,2, weight = 0.2)
+    G.add_edge(2,3, weight = 0.14)
+    G.add_edge(3,4, weight = 0.11)
+    G.add_edge(4,5, weight = 0.15)
+    G.add_edge(5,6, weight = 0.12)
+    G.add_edge(6,7, weight = 0.1)
+    G.add_edge(7,8, weight = 0.1)
+    G.add_edge(8,9, weight = 0.15)
+    G.add_edge(9,10, weight = 0.16)
+    G.add_edge(10,11, weight = 0.1)
+    G.add_edge(11,12, weight = 0.07)
+    G.add_edge(12,13, weight = 0.08)
+    G.add_edge(13,14, weight = 0.18)
+
+    G.add_edge(26,25, weight = 0.11)
+    G.add_edge(25,24, weight = 0.15)
+    G.add_edge(24,23, weight = 0.02)
+    G.add_edge(23,22, weight = 0.15)
+    G.add_edge(22,21, weight = 0.09)
+    G.add_edge(21,20, weight = 0.09)
+    G.add_edge(20,19, weight = 0.12)
+    G.add_edge(19,18, weight = 0.15)
+    G.add_edge(18,17, weight = 0.11)
+    G.add_edge(17,16, weight = 0.13)
+    G.add_edge(16,15, weight = 0.21)
+
+    G.add_edge(27,28, weight = 0.19)
+    G.add_edge(28,29, weight = 0.14)
+    G.add_edge(29,30, weight = 0.115)
+    G.add_edge(30,31, weight = 0.16)
+    G.add_edge(31,32, weight = 0.12)
+    G.add_edge(33,34, weight = 0.11)
+    G.add_edge(34,35, weight = 0.07)
+    G.add_edge(35,36, weight = 0.08)
+    G.add_edge(36,37, weight = 0.17)
+
+    G.add_edge(47,46, weight = 0.17)
+    G.add_edge(46,45, weight = 0.15)
+    G.add_edge(45,44, weight = 0.12)
+    G.add_edge(43,42, weight = 0.13)
+    G.add_edge(42,41, weight = 0.15)
+    G.add_edge(41,40, weight = 0.11)
+    G.add_edge(40,39, weight = 0.14)
+    G.add_edge(39,38, weight = 0.22)
+
+    G.add_edge(48,49, weight = 0.24)
+    G.add_edge(49,50, weight = 0.16)
+    G.add_edge(50,51, weight = 0.12)
+    G.add_edge(51,52, weight = 0.141)
+    G.add_edge(52,53, weight = 0.12)
+    G.add_edge(53,54, weight = 0.18)
+    G.add_edge(54,55, weight = 0.16)
+    G.add_edge(55,56, weight = 0.15)
+    G.add_edge(56,57, weight = 0.11)
+    G.add_edge(57,58, weight = 0.15)
+    G.add_edge(58,59, weight = 0.18)
+
+    G.add_edge(1, 15, weight=0.07)
+    G.add_edge(15, 1, weight=0.07)
+    G.add_edge(15, 27, weight=0.1)
+    G.add_edge(27, 15, weight=0.1)
+    G.add_edge(27, 38, weight=0.055)
+    G.add_edge(38, 27, weight=0.055)
+    G.add_edge(38, 48, weight=0.13)
+    G.add_edge(48, 38, weight=0.13)
+
+    G.add_edge(49, 39, weight=0.12)
+    G.add_edge(39, 28, weight=0.056)
+    G.add_edge(28, 16, weight=0.11)
+    G.add_edge(16, 2, weight=0.08)
+
+    G.add_edge(3, 17, weight=0.07)
+    G.add_edge(17, 29, weight=0.1)
+    G.add_edge(29, 40, weight=0.055)
+    G.add_edge(40, 50, weight=0.115)
     
-    # Calles
-    G.add_weighted_edges_from([(1,2,0.2), (2,3,0.14), (3,4,0.11), (4,5,0.15), (5,6,0.12), (6,7,0.1), (7,8,0.1), (8,9,0.15), (9,10,0.16), (10,11,0.1), (11,12,0.07), (12,13,0.08), (13,14,0.18)])
-    G.add_weighted_edges_from([(26,25,0.11), (25,24,0.15), (24,23,0.02), (23,22,0.15), (22,21,0.09), (21,20,0.09), (20,19,0.12), (19,18,0.15), (18,17,0.11), (17,16,0.13), (16,15,0.21)])
-    G.add_weighted_edges_from([(27,28,0.19), (28,29,0.14), (29,30,0.115), (30,31,0.16), (31,32,0.12), (33,34,0.11), (34,35,0.07), (35,36,0.08), (36,37,0.17)])
-    G.add_weighted_edges_from([(47,46,0.17), (46,45,0.15), (45,44,0.12), (43,42,0.13), (42,41,0.15), (41,40,0.11), (40,39,0.14), (39,38,0.22)])
-    G.add_weighted_edges_from([(48,49,0.24), (49,50,0.16), (50,51,0.12), (51,52,0.141), (52,53,0.12), (53,54,0.18), (54,55,0.16), (55,56,0.15), (56,57,0.11), (57,58,0.15), (58,59,0.18)])
+    G.add_edge(51, 41, weight=0.12)
+    G.add_edge(41, 30, weight=0.056)
+    G.add_edge(30, 18, weight=0.1)
+    G.add_edge(18, 4, weight=0.09)
 
-    # Avenidas
-    avenidas = [
-        (1,15,0.07), (15,1,0.07), (15,27,0.1), (27,15,0.1), (27,38,0.055), (38,27,0.055), (38,48,0.13), (48,38,0.13),
-        (49,39,0.12), (39,28,0.056), (28,16,0.11), (16,2,0.08),
-        (3,17,0.07), (17,29,0.1), (29,40,0.055), (40,50,0.115),
-        (51,41,0.12), (41,30,0.056), (30,18,0.1), (18,4,0.09),
-        (5,19,0.08), (19,31,0.1), (31,42,0.055), (42,52,0.13),
-        (53,43,0.13), (53,32,0.055), (32,20,0.1), (20,6,0.08),
-        (7,21,0.08), (54,22,0.29), (22,8,0.08), (9,23,0.09), (24,55,0.292),
-        (56,44,0.13), (44,33,0.055), (33,25,0.1), (25,10,0.07),
-        (11,26,0.08), (26,34,0.11), (34,45,0.06), (45,57,0.135),
-        (12,35,0.19), (58,46,0.135), (46,36,0.06), (36,13,0.19),
-        (14,37,0.2), (37,47,0.06), (47,59,0.135)
-    ]
-    for u, v, w in avenidas:
-        G.add_edge(u, v, weight=w)
+    G.add_edge(5, 19, weight=0.08)
+    G.add_edge(19, 31, weight=0.1)
+    G.add_edge(31, 42, weight=0.055)
+    G.add_edge(42, 52, weight=0.13)
+    
+    G.add_edge(53, 43, weight=0.13)
+    G.add_edge(53, 32, weight=0.055)
+    G.add_edge(32, 20, weight=0.1)
+    G.add_edge(20, 6, weight=0.08)
 
-    for id_lugar, data in LUGARES.items():
-        nombre = data['nombre']
-        G.add_node(nombre)
-        for nodo_calle, peso in data['conn']:
-            G.add_edge(nombre, nodo_calle, weight=peso)
-            G.add_edge(nodo_calle, nombre, weight=peso)
+    G.add_edge(7, 21, weight=0.08)
+
+    G.add_edge(54, 22, weight=0.29)
+    G.add_edge(22,8, weight=0.08)
+
+    G.add_edge(9,23, weight=0.09)
+
+    G.add_edge(24,55, weight=0.292)
+
+    G.add_edge(56, 44, weight=0.13)
+    G.add_edge(44, 33, weight=0.055)
+    G.add_edge(33, 25, weight=0.1)
+    G.add_edge(25, 10, weight=0.07)
+
+    G.add_edge(11, 26, weight=0.08)
+    G.add_edge(26, 34, weight=0.11)
+    G.add_edge(34, 45, weight=0.06)
+    G.add_edge(45, 57, weight=0.135)
+
+    G.add_edge(12, 35, weight=0.19)
+
+    G.add_edge(58, 46, weight=0.135)
+    G.add_edge(46, 36, weight=0.06)
+    G.add_edge(36, 13, weight=0.19)
+
+    G.add_edge(14, 37, weight=0.2)
+    G.add_edge(37, 47, weight=0.06)
+    G.add_edge(47, 59, weight=0.135)
+    
+    return G
+
+def agregar_POIs(G):
+    poi_centro_tecnico = "Centro técnico Guatemalteco"
+    G.add_node(poi_centro_tecnico)
+    G.add_edge(1, poi_centro_tecnico, weight=0.02)
+    G.add_edge(poi_centro_tecnico, 1, weight=0.02)
+    G.add_edge(15, poi_centro_tecnico, weight=0.05)
+    G.add_edge(poi_centro_tecnico, 15, weight=0.05)
+
+    poi_conacmi = "CONACMI"
+    G.add_node(poi_conacmi)
+    G.add_edge(3, poi_conacmi, weight=0.035)
+    G.add_edge(poi_conacmi, 17, weight=0.035)
+
+    poi_colegio_anglo = "Colegio Anglo Guatemalteco"
+    G.add_node(poi_colegio_anglo)
+    G.add_edge(27, poi_colegio_anglo, weight=0.08)
+    G.add_edge(poi_colegio_anglo, 28, weight=0.11)
+
+    poi_pnc = "PNC"
+    G.add_node(poi_pnc)
+    G.add_edge(30, poi_pnc, weight=0.02)
+    G.add_edge(poi_pnc, 18, weight=0.08)
+    
+    poi_santuario = "Santuario de Guadalupe"
+    G.add_node(poi_santuario)
+    G.add_edge(40, poi_santuario, weight=0.7)
+    G.add_edge(poi_santuario, 39, weight=0.7)
+    
+    poi_gyt = "G&T" 
+    G.add_node(poi_gyt)
+    G.add_edge(42, poi_gyt, weight=0.075)
+    G.add_edge(poi_gyt, 41, weight=0.075)
+
+    poi_parque_jbm = "Parque José Batres Montufar"
+    G.add_node(poi_parque_jbm)
+    G.add_edge(3, poi_parque_jbm, weight=0.09)
+    G.add_edge(poi_parque_jbm, 4, weight=0.02)
+
+    poi_la_torre = "Supermercado La Torre"
+    G.add_node(poi_la_torre)
+    G.add_edge(20, poi_la_torre, weight=0.1)
+    G.add_edge(poi_la_torre, 19, weight=0.02)
+
+    poi_patsy = "PATSY"
+    G.add_node(poi_patsy)
+    G.add_edge(20, poi_patsy, weight=0.02)
+    G.add_edge(poi_patsy, 6, weight=0.06)
+
+    poi_palacio_nacional = "Palacio Nacional de la Cultura"
+    G.add_node(poi_palacio_nacional)
+    G.add_edge(22, poi_palacio_nacional, weight=0.05)
+    G.add_edge(poi_palacio_nacional, 21, weight=0.05)
+
+    poi_pizza_hut = "Pizza Hut"
+    G.add_node(poi_pizza_hut)
+    G.add_edge(54, poi_pizza_hut, weight=0.11)
+    G.add_edge(poi_pizza_hut, 22, weight=0.18)
+
+    poi_alma_cisne = "Almacén el Cisne"
+    G.add_node(poi_alma_cisne)
+    G.add_edge(25, poi_alma_cisne, weight=0.05)
+    G.add_edge(poi_alma_cisne, 24, weight=0.1)
+
+    poi_sis_peniten = "Direccion General del Sistema Peninteciario"
+    G.add_node(poi_sis_peniten)
+    G.add_edge(35, poi_sis_peniten, weight=0.04)
+    G.add_edge(poi_sis_peniten, 36, weight=0.04)
+
+    poi_hotel = "Hotel"
+    G.add_node(poi_hotel)
+    G.add_edge(13, poi_hotel, weight=0.05)
+    G.add_edge(poi_hotel, 14, weight=0.13)
+    
+    poi_parque_colon = "Parque Colón"
+    G.add_node(poi_parque_colon)
+    G.add_edge(47, poi_parque_colon, weight=0.085)
+    G.add_edge(poi_parque_colon, 46, weight=0.085)
+    G.add_edge(58, poi_parque_colon, weight=0.065)
+    G.add_edge(poi_parque_colon, 46, weight=0.065)
+
+    poi_merc_central = "Mercado Central"
+    G.add_node(poi_merc_central)
+    G.add_edge(44, poi_merc_central, weight=0.028)
+    G.add_edge(poi_merc_central, 33, weight=0.027)
+
+    poi_plaza = "Plaza de la constitucion"
+    G.add_node(poi_plaza)
+    G.add_edge(54, poi_plaza, weight=0.13)
+    G.add_edge(poi_plaza, 22, weight=0.16)
+    G.add_edge(43, poi_plaza, weight=0.028)
+    G.add_edge(poi_plaza, 32, weight=0.027)
 
     return G
 
-mapa_completo = construir_grafo()
+def aplicar_trafico(graph, aplicar_pesado, aplicar_ligero):
+    mapa_con_trafico = graph.copy()
+    factor_pesado = 10.0
+    factor_ligero = 5.0 
+    
+    calles_trafico_pesado = [
+        (52, 53), (53, 54), (54, 55), (55, 56), (56, 57),
+        (54, 22), (22, 8), (11, 26), (26, 34), (34, 45), (45, 57),
+    ]
+    
+    calles_trafico_ligero = [
+        (4, 5), (5, 6), (29, 40), (40, 50),
+        (37, 47), (47, 46), (46, 45),
+    ]
+
+    if aplicar_pesado:
+        for u, v in calles_trafico_pesado:
+            if mapa_con_trafico.has_edge(u, v):
+                mapa_con_trafico[u][v]['weight'] *= factor_pesado
+
+    if aplicar_ligero:
+        for u, v in calles_trafico_ligero:
+            if mapa_con_trafico.has_edge(u, v):
+                mapa_con_trafico[u][v]['weight'] *= factor_ligero
+            
+    return mapa_con_trafico
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/get_data')
-def get_data():
+@app.route('/get_pois')
+def get_pois():
     return jsonify(LUGARES)
 
 @app.route('/calcular', methods=['POST'])
@@ -76,13 +285,48 @@ def calcular():
     try:
         id_origen = int(data.get('origen'))
         id_destino = int(data.get('destino'))
-        nombre_origen = LUGARES[id_origen]['nombre']
-        nombre_destino = LUGARES[id_destino]['nombre']
         
-        ruta = nx.dijkstra_path(mapa_completo, nombre_origen, nombre_destino, weight='weight')
-        dist = nx.dijkstra_path_length(mapa_completo, nombre_origen, nombre_destino, weight='weight')
+        modo = data.get('modo') 
+        id_intermedio = data.get('intermedio') 
+        trafico_pesado = data.get('trafico_pesado', False)
+        trafico_ligero = data.get('trafico_ligero', False)
+
+        origen = LUGARES[id_origen]
+        destino = LUGARES[id_destino]
         
-        return jsonify({'success': True, 'ruta': ruta, 'distancia': round(dist, 3)})
+        graph = grafo_base()
+        graph = agregar_POIs(graph)
+        graph = aplicar_trafico(graph, trafico_pesado, trafico_ligero)
+
+        ruta = []
+        distancia = 0
+
+        if modo == 'simple':
+            ruta = nx.dijkstra_path(graph, origen, destino, weight='weight')
+            distancia = nx.dijkstra_path_length(graph, origen, destino, weight='weight')
+
+        elif modo == 'parada':
+            if id_intermedio:
+                intermedio = LUGARES[int(id_intermedio)]
+                r1 = nx.dijkstra_path(graph, origen, intermedio, weight='weight')
+                d1 = nx.dijkstra_path_length(graph, origen, intermedio, weight='weight')
+                r2 = nx.dijkstra_path(graph, intermedio, destino, weight='weight')
+                d2 = nx.dijkstra_path_length(graph, intermedio, destino, weight='weight')
+                ruta = r1 + r2[1:]
+                distancia = d1 + d2
+
+        elif modo == 'obstaculo':
+            if id_intermedio:
+                obstaculo = LUGARES[int(id_intermedio)]
+                if graph.has_node(obstaculo):
+                    graph.remove_node(obstaculo)
+                ruta = nx.dijkstra_path(graph, origen, destino, weight='weight')
+                distancia = nx.dijkstra_path_length(graph, origen, destino, weight='weight')
+
+        return jsonify({'success': True, 'ruta': ruta, 'distancia': round(distancia, 3)})
+
+    except nx.NetworkXNoPath:
+        return jsonify({'success': False, 'message': 'No hay ruta posible.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 

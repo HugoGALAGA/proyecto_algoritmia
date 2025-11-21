@@ -1,11 +1,9 @@
 const mapGrid = document.getElementById('map-grid');
 const selOrigen = document.getElementById('origen');
 const selDestino = document.getElementById('destino');
+const selIntermedio = document.getElementById('intermedio');
+const selModo = document.getElementById('modo');
 const statusDiv = document.getElementById('status');
-
-// ========================================================
-// 1. DICCIONARIO DE POIS
-// ========================================================
 
 const POI_LIST = {
     1: "Centro Técnico",
@@ -106,76 +104,69 @@ let COORDENADAS = {
     "p-17": { t: 74.6, l: 34.1 },
 };
 
-
-
 function getCoord(id, type) {
     const key = (type === 'street') ? `s-${id}` : `p-${id}`;
-    // Si no existe coordenada, centra el nodo para que puedas verlo y moverlo
     return COORDENADAS[key] || { t: 50, l: 50 };
 }
 
-// ==========================================
-// 3. INICIALIZACION
-// ==========================================
 function init() {
-    // 1. Crear Nodos de Calle (1-59)
     for (let i = 1; i <= 59; i++) {
         createNode(i, 'street');
     }
 
-    // 2. Crear Nodos POI usando el diccionario local
     for (const [id, nombre] of Object.entries(POI_LIST)) {
-        // Crear nodo visual
         createNode(id, 'poi', nombre);
-
-        // Llenar Selects
-        const label = `Punto ${id}`;
+        
+        const label = `${id}. ${nombre}`;
         const opt = `<option value="${id}">${label}</option>`;
+        
         selOrigen.innerHTML += opt;
         selDestino.innerHTML += opt;
+        selIntermedio.innerHTML += opt;
     }
-
-    // Seleccion por defecto diferente para UX
-    if (selDestino.options.length > 1) selDestino.selectedIndex = 1;
+    
+    if(selDestino.options.length > 1) selDestino.selectedIndex = 1;
 }
 
 function createNode(id, type, name = "") {
     const el = document.createElement('div');
     el.className = `node ${type}`;
-    
-    // ID del DOM unico: node-s-1 (calle) o node-p-1 (POI)
-    const domId = `node-${type === 'street' ? 's' : 'p'}-${id}`;
-    el.id = domId;
-    
-    // Texto visible: Solo si es POI mostramos el ID, calles van vacias
+    el.id = `node-${type === 'street' ? 's' : 'p'}-${id}`;
     el.innerText = (type === 'poi') ? id : '';
-    
-    // Metadata
     el.dataset.logicId = id;
     if (name) el.dataset.name = name;
-    if (name) el.title = name;
-
-    // Posicion
+    
     const pos = getCoord(id, type);
     el.style.top = pos.t + '%';
     el.style.left = pos.l + '%';
-
-    // Activar logica de arrastre para edicion
+    
     makeDraggable(el);
-
     mapGrid.appendChild(el);
 }
 
-// ==========================================
-// 4. CALCULO DE RUTA
-// ==========================================
+function toggleIntermedio() {
+    const modo = selModo.value;
+    const group = document.getElementById('group-intermedio');
+    const label = document.getElementById('label-intermedio');
+    
+    if (modo === 'simple') {
+        group.style.display = 'none';
+    } else {
+        group.style.display = 'flex';
+        label.innerText = (modo === 'parada') ? 'PARADA EN (C)' : 'EVITAR (C)';
+    }
+}
+
 async function calcularRuta() {
     const idA = selOrigen.value;
     const idB = selDestino.value;
+    const modo = selModo.value;
+    const idC = selIntermedio.value;
+    const pesado = document.getElementById('trafico-pesado').checked;
+    const ligero = document.getElementById('trafico-ligero').checked;
 
-    // Limpiar estados anteriores
     document.querySelectorAll('.node').forEach(el => {
-        el.classList.remove('active', 'start', 'end');
+        el.classList.remove('active', 'start', 'end', 'inter');
     });
 
     statusDiv.innerText = "Calculando...";
@@ -184,118 +175,87 @@ async function calcularRuta() {
         const res = await fetch('/calcular', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ origen: idA, destino: idB })
+            body: JSON.stringify({ 
+                origen: idA, 
+                destino: idB, 
+                modo: modo, 
+                intermedio: idC,
+                trafico_pesado: pesado,
+                trafico_ligero: ligero
+            })
         });
         const data = await res.json();
 
         if(data.success) {
-            statusDiv.innerHTML = `Ruta: ${idA} -> ${idB}<br>Distancia: ${data.distancia} km`;
-            animar(data.ruta, idA, idB);
+            statusDiv.innerHTML = `Ruta OK<br>Tiempo: ${data.distancia} min`;
+            animar(data.ruta, idA, idB, (modo !== 'simple' ? idC : null));
         } else {
             statusDiv.innerText = "Error: " + data.message;
         }
     } catch (error) {
-        statusDiv.innerText = "Error de conexion.";
-        console.error(error);
+        statusDiv.innerText = "Error de conexión.";
     }
 }
 
-function animar(ruta, idStart, idEnd) {
+function animar(ruta, idStart, idEnd, idInter) {
     ruta.forEach((paso, i) => {
         setTimeout(() => {
             let selector = "";
-            
             if (typeof paso === 'number') {
-                // Es un numero -> Nodo de Calle
                 selector = `#node-s-${paso}`;
             } else {
-                // Es un string -> Nodo POI (buscamos por nombre)
                 selector = `.node.poi[data-name="${paso}"]`;
             }
-            
             const el = document.querySelector(selector);
             if(el) el.classList.add('active');
-
-        }, i * 100); // Velocidad de animacion
+        }, i * 100);
     });
 
-    // Iluminar Inicio y Fin inmediatamente
     setTimeout(() => {
-        const startEl = document.getElementById(`node-p-${idStart}`);
-        const endEl = document.getElementById(`node-p-${idEnd}`);
-        if(startEl) startEl.classList.add('start');
-        if(endEl) endEl.classList.add('end');
+        document.getElementById(`node-p-${idStart}`).classList.add('start');
+        document.getElementById(`node-p-${idEnd}`).classList.add('end');
+        if(idInter) {
+            const el = document.getElementById(`node-p-${idInter}`);
+            if(el) el.classList.add('inter');
+        }
     }, 0);
 }
 
-// ==========================================
-// 5. SISTEMA DE EDICION
-// ==========================================
 let isEditMode = false;
-
 function toggleEditMode() {
     isEditMode = !isEditMode;
     document.body.classList.toggle('edit-mode');
-    
     const btn = document.getElementById('edit-btn');
-    if(btn) btn.innerText = isEditMode ? "GUARDAR (Ver Consola)" : "Editar";
-
-    // Al desactivar, imprimimos el JSON
-    if (!isEditMode) {
-        exportCoords();
-    }
+    if(btn) btn.innerText = isEditMode ? "GUARDAR" : "Editar";
+    if (!isEditMode) exportCoords();
 }
 
 function makeDraggable(el) {
     let isDragging = false;
-
     el.addEventListener('mousedown', (e) => {
         if (!isEditMode) return;
         isDragging = true;
         el.style.cursor = 'grabbing';
-        e.preventDefault(); // Evitar seleccion de texto
+        e.preventDefault();
     });
-
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        
         const rect = mapGrid.getBoundingClientRect();
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
-        
-        // Convertir a porcentaje
-        let leftPct = (x / rect.width) * 100;
-        let topPct = (y / rect.height) * 100;
-
-        el.style.left = leftPct.toFixed(1) + '%';
-        el.style.top = topPct.toFixed(1) + '%';
+        el.style.left = ((x / rect.width) * 100).toFixed(1) + '%';
+        el.style.top = ((y / rect.height) * 100).toFixed(1) + '%';
     });
-
-    window.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            el.style.cursor = isEditMode ? 'grab' : 'default';
-        }
-    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
 }
 
 function exportCoords() {
-    console.log("--- COPIA ESTO Y REEMPLAZA LA VARIABLE COORDENADAS ---");
     console.log("let COORDENADAS = {");
-    
-    const nodes = document.querySelectorAll('.node');
-    nodes.forEach(el => {
-        const t = parseFloat(el.style.top).toFixed(1);
-        const l = parseFloat(el.style.left).toFixed(1);
-        
-        // Obtiene la clave limpia: 's-1' o 'p-1'
+    document.querySelectorAll('.node').forEach(el => {
         const key = el.id.replace('node-', '');
-        console.log(`    "${key}": { t: ${t}, l: ${l} },`);
+        console.log(`    "${key}": { t: ${parseFloat(el.style.top)}, l: ${parseFloat(el.style.left)} },`);
     });
-    
     console.log("};");
-    alert("Coordenadas exportadas a la consola (F12).");
 }
 
-// Iniciar aplicacion
 init();
