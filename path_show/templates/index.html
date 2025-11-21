@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navegación por Puntos</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Botón para activar arrastre si necesitas corregir posiciones -->
+    <button id="edit-btn" onclick="toggleEditMode()" style="position:fixed; top:10px; right:10px; z-index:1000; opacity:0.5;">Editar</button>
+
+    <div class="layout">
+        <div class="sidebar">
+            <h2 class="neon-title">RUTA DIGITAL</h2>
+            
+            <div class="control-group">
+                <label>PUNTO DE INICIO</label>
+                <select id="origen"></select>
+            </div>
+
+            <div class="control-group">
+                <label>PUNTO DE LLEGADA</label>
+                <select id="destino"></select>
+            </div>
+
+            <button onclick="calcularRuta()">INICIAR RUTA</button>
+
+            <div id="status">Sistema en espera.</div>
+        </div>
+
+        <div class="map-container">
+            <div id="map-grid"></div>
+        </div>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>
