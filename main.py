@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt 
-from mapdata import grafo_base, agregar_POIs
+from mapdata import grafo_base, agregar_POIs, aplicar_trafico
+
 
 def encontrar_ruta(graph, origen, destino):
     try:
@@ -27,10 +28,10 @@ def opcion_b_ruta_con_parada(graph, origen, parada, destino):
         longitud_total = longitud1 + longitud2
         
         print(f"\n--- Ruta con parada en '{parada}' ---")
-        print(f"Tramo 1 ({origen} -> {parada}): {longitud1:.2f} km")
-        print(f"Tramo 2 ({parada} -> {destino}): {longitud2:.2f} km")
+        print(f"Tramo 1 ({origen} -> {parada}): {longitud1:.2f} minutos")
+        print(f"Tramo 2 ({parada} -> {destino}): {longitud2:.2f} minutos")
         print(f"\nCamino: {' -> '.join(map(str, ruta_completa))}")
-        print(f"Distancia Total: {longitud_total:.2f} km")
+        print(f"Distancia Total: {longitud_total:.2f} minutos")
     else:
         print("\nNo se pudo calcular la ruta")
 
@@ -46,7 +47,7 @@ def opcion_c_ruta_con_obstaculo(graph, origen, destino, obstaculo):
         
         if ruta:
             print(f"Camino: {' -> '.join(map(str, ruta))}")
-            print(f"Distancia total: {longitud:.2f} km")
+            print(f"Distancia total: {longitud:.2f} minutos")
         else:
             print(f"No hay ruta de'{origen}' a '{destino}' evitando '{obstaculo}'.")
     else:
@@ -64,13 +65,37 @@ if __name__ == "__main__":
         print("a) Ruta mas rapida (de A a B)")
         print("b) Ruta con parada (de A a B, pasando por C)")
         print("c) Ruta con obstaculo (de A a B, evitando C)")
+        print("d) Ruta con trafico (Simular hora pico)") 
         print("Escriba 'x' para cerrar el programa.")
         print("-"*40)
         
-        opcion = input("Seleccione una opción (a, b, c): ").lower()
+        opcion = input("Seleccione una opción (a, b, c, d, x): ").lower()
         
         if opcion == 'x':
             print("Programa finalizado, Chao (～￣▽￣)～")
+            print("Esto no es un emoji")
+            print('''
+                ⠰⡉⢆⢡⠃⣄⠣⢀⠣⠄⢘⡡⠘⡄⢣⢘⠰⣈⠒⡌⡘⠤⡑⢊⠔⡉⢆⠱⢠⠃⡄⣹⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣻⡽⣯⠟
+                ⢂⠱⡈⠆⣸⢆⠡⢂⠒⣈⠐⡄⢋⠔⡡⢊⠔⢢⠑⡄⢃⡒⢡⠊⡔⢡⠊⡔⢡⠊⡔⢙⣿⣿⣿⣿⣿⣿⣿⣿⣟⣯⢿⡽⢧⢋
+                ⡈⢆⡑⢲⢻⣌⡳⣌⢶⣠⢃⠘⠤⢊⠔⡡⢊⠤⢃⠜⡰⢈⠆⡱⢈⠆⡱⢈⠆⡱⢈⠜⣿⣿⣿⣿⣿⣿⣿⣿⢯⣟⣯⣟⡯⢆
+                ⡐⢂⠀⡀⠁⢚⠿⣽⣻⢾⣭⠎⡐⢣⠘⡄⢣⠘⡄⢎⠰⡁⢎⠰⡁⢎⠰⡁⢎⠰⡁⠆⢿⡿⣿⣿⣿⣿⡿⣯⣿⣻⢾⣽⣛⡆
+                ⡘⢄⣀⠀⠸⣿⣿⣶⣭⡛⢾⣓⠈⢆⠱⡈⢆⠱⡈⢆⠱⡈⢆⠱⡈⢆⠱⡈⢆⠱⣈⠱⡘⠿⡽⢻⡞⣷⢻⢯⠷⣟⠿⠾⠝⠂
+                ⠌⣸⣿⢿⡄⢻⣿⣿⣿⣿⣷⣦⣉⠢⡑⢌⠢⡑⢌⠢⡑⢌⠢⡑⢌⠢⡑⢌⠢⡑⠤⢃⠄⠰⢀⠃⡐⠠⠂⣀⣢⣴⣶⣿⡇⠀
+                ⢲⣿⢯⣟⣷⡘⣿⣿⣿⣿⣿⣿⣿⣷⣮⡀⢇⡘⢄⠣⡘⢄⠣⡘⢄⠣⡘⢢⢑⡘⡰⢉⠜⠀⡌⣤⣴⣶⣿⣿⣿⣿⣿⣿⠇⠀
+                ⣿⢯⣟⡿⣞⠳⡘⢿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡘⠄⢣⣜⣀⣃⣘⣂⣡⣑⣂⣈⢐⣁⣎⣶⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⡐
+                ⣿⢯⡿⣽⢏⢣⠐⡈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⣀⠔⡠
+                ⠌⢋⡙⠤⠋⢄⠃⠤⠁⠙⢿⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⣡⣾⢯⣟⡔
+                ⠀⠂⠀⠄⢁⠂⠌⠤⢁⠂⠀⢡⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⡻⢋⣥⣾⡿⣯⣟⡾⡐
+                ⠀⠀⠀⠀⠀⡈⠰⢈⠆⡘⢠⣿⣿⣿⣿⡿⠛⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⢿⣿⣿⣿⣿⣿⣷⡜⢯⣷⣻⢷⡻⣜⠡
+                👾⠀⠀⠀⢀⠡⢊⠔⣉⣾⣿⣿⣿⣿⠘⠛⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠘⠟⠀⣿⣿⣿⣿⣿⣿⣿⡨⢓⡹⢎⡱⢌⠡
+                ⠀⠀⠀⠀⠀⠀⠂⠥⡚⣼⣿⣿⣿⣿⣿⣶⣤⣾⣿⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣷⣤⣶⣿⣿⣿⣿⣿⣿⣿⣇⠡⠒⢄⠒⡨⠐
+                ⠀⠀⠀⠀⠀⠠⡉⢦⢡⡿⢟⡻⠟⠿⣿⣿⣿⣿⣿⣿⣿⣷⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡿⢟⢻⡛⢻⣿⣿⣿⡄⢡⠊⠤⡑⠌
+                ⢀⡄⣄⢢⣌⡵⣜⣮⢹⣡⠚⣔⢋⢎⣹⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⠔⣊⠦⣍⢣⢾⣿⣿⡧⢮⣝⣲⢡⢊
+                ⣾⣼⣞⡷⣾⣽⣻⢾⣸⣷⣼⣬⣷⣴⣿⣿⣿⣿⣿⣿⡏⣾⣿⣿⣿⣷⢹⣿⣿⣿⣿⣿⣲⣩⣶⣬⣶⣾⣿⣿⣿⠾⣽⣳⣏⠆
+                ⣿⢾⣽⣻⢷⣯⣟⣯⣧⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣙⣿⠿⡿⣏⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣳⢿⡌
+                ⣿⢯⣷⢿⣻⡾⣽⣳⣯⢧⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣾⣽⡻⡔
+                ⣟⡿⣞⣯⢷⣻⣽⣳⢯⡟⣇⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠓⣯⠳⠌
+                ⠸⢹⠙⡎⢏⠳⢍⠫⡙⡜⢄⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠣⡙⡐''')
             break
             
         elif opcion == 'a':
@@ -80,7 +105,7 @@ if __name__ == "__main__":
             if ruta:
                 print(f"\n--- Ruta encontrada de '{origen}' a '{destino}' ---")
                 print(f"Camino: {' -> '.join(map(str, ruta))}")
-                print(f"Distancia total: {longitud:.2f} km")
+                print(f"Tiempo total: {longitud:.2f} minutos")
             else:
                 print(f"\nNo se encontro una ruta")
 
@@ -96,5 +121,20 @@ if __name__ == "__main__":
             obstaculo = procesar_input(input("Punto a evitar (C): "))
             opcion_c_ruta_con_obstaculo(mapa_completo, origen, destino, obstaculo)
 
+        elif opcion == 'd':
+            origen = procesar_input(input("Punto de inicio: "))
+            destino = procesar_input(input("Destino: "))
+            
+            mapa_con_trafico = aplicar_trafico(mapa_completo)
+            
+            ruta, longitud = encontrar_ruta(mapa_con_trafico, origen, destino)
+            
+            if ruta:
+                print(f"\n--- Ruta con tráfico de '{origen}' a '{destino}' ---")
+                print(f"Camino: {' -> '.join(map(str, ruta))}")
+                print(f"Mejor tiempo (considerando tráfico): {longitud:.2f} minutos")
+            else:
+                print(f"\nNo se encontro ruta")
+
         else:
-            print("\nEscoja a, b, c o x")
+            print("\nEscoja a, b, c, d o x")

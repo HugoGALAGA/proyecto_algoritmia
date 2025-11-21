@@ -265,3 +265,31 @@ def agregar_POIs(G):
     G.add_edge(poi_plaza, 32, weight=0.027)
 
     return G 
+
+def aplicar_trafico(graph):
+    mapa_con_trafico = graph.copy()
+    
+    factor_pesado = 10.0
+    factor_ligero = 5.0 
+    
+    calles_trafico_pesado = [
+        (52, 53), (53, 54), (54, 55), (55, 56), (56, 57),
+        (54, 22), (22, 8), (11, 26), (26, 34), (34, 45), (45, 57),
+    ]
+    
+    calles_trafico_ligero = [
+        (4, 5), (5, 6), (29, 40), (40, 50),
+        (37, 47), (47, 46), (46, 45),
+    ]
+
+    print("\nHora Pico")
+    
+    for u, v in calles_trafico_pesado:
+        if mapa_con_trafico.has_edge(u, v):
+            mapa_con_trafico[u][v]['weight'] *= factor_pesado
+            
+    for u, v in calles_trafico_ligero:
+        if mapa_con_trafico.has_edge(u, v):
+            mapa_con_trafico[u][v]['weight'] *= factor_ligero
+            
+    return mapa_con_trafico
