@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt 
 from mapdata import grafo_base, agregar_POIs
-#prueba para verificar usuario de github
 
 def encontrar_ruta(graph, origen, destino):
     try:
